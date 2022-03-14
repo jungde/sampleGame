@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - BombExplosion
+  - Fade
+  - SpawnPoint
+  - Wall
+  - Obstacle
+  - BreakableObstacle
+  - Grid
+  - Enemy
+  - RemainingTime
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - DebugLayer
+  - Player
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: B
+    uniqueID: 3378447871
+    locked: 0
+  - name: Floor
+    uniqueID: 1378560285
+    locked: 0
+  - name: OnFloor
+    uniqueID: 2237562723
+    locked: 0
+  - name: Player
+    uniqueID: 1423258179
+    locked: 0
+  - name: T
+    uniqueID: 630563797
+    locked: 0
