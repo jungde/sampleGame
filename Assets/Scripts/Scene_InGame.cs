@@ -13,7 +13,7 @@ public class Scene_InGame : MonoBehaviour
     Tilemap _tilemapHill;
     Tilemap _tilemapWall;
     Tilemap _tilemapFloor;
-    TextMeshProUGUI _RemainingTime;
+    //TextMeshProUGUI _RemainingTime;
 
     int _mapFloorWidth = 29;
     int _mapFloorHeight = 13;
@@ -37,7 +37,7 @@ public class Scene_InGame : MonoBehaviour
         _tilemapHill = GameObject.Find("Tilemap_Hill").GetComponent<Tilemap>();
         _tilemapWall = GameObject.Find("Tilemap_Wall").GetComponent<Tilemap>();
         _tilemapFloor = GameObject.Find("Tilemap_Floor").GetComponent<Tilemap>();
-        _RemainingTime = GameObject.FindGameObjectWithTag("RemainingTime").GetComponent<TextMeshProUGUI>();
+        //_RemainingTime = GameObject.FindGameObjectWithTag("RemainingTime").GetComponent<TextMeshProUGUI>();
 
         _mapData = new MapTile[_mapFloorHeight, _mapFloorWidth];
         InitMapData();
