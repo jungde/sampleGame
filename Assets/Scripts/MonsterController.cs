@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MonsterController : BaseController
 {
-    Scene_InGame _game;
+    Scene_Menu _menuScene;
+    Scene_InGame _gameScene;
 
     float _speed = 0.01f;
     Vector3 _dest;
@@ -26,18 +28,31 @@ public class MonsterController : BaseController
         _rigid2D = GetComponent<Rigidbody2D>();
         _circleCollider2D = GetComponent<CircleCollider2D>();
         _animator = GetComponent<Animator>();
-        _game = GameObject.Find("@Scene").GetComponent<Scene_InGame>();
+        _menuScene = GameObject.Find("@Scene").GetComponent<Scene_Menu>();
+        _gameScene = GameObject.Find("@Scene").GetComponent<Scene_InGame>();
 
         _dest = transform.position;
     }
 
     protected override void Update()
     {
-        if( (_game.GetCellIndex(transform.position) == _game.GetCellIndex(_dest)) &&
-            Vector3.Magnitude(_dest - transform.position)<=0.05f )
+        if (SceneManager.GetActiveScene().name == "Menu")
         {
-            transform.position = _dest;
-            FindingWay();
+            if ((_menuScene.GetCellIndex(transform.position) == _menuScene.GetCellIndex(_dest)) &&
+                Vector3.Magnitude(_dest - transform.position) <= 0.05f)
+            {
+                transform.position = _dest;
+                FindingWayMenu();
+            }
+        }
+        else if (SceneManager.GetActiveScene().name == "InGame")
+        {
+            if ((_gameScene.GetCellIndex(transform.position) == _gameScene.GetCellIndex(_dest)) &&
+                Vector3.Magnitude(_dest - transform.position) <= 0.05f)
+            {
+                transform.position = _dest;
+                FindingWay();
+            }
         }
 
         transform.position = Vector3.MoveTowards(transform.position, _dest, _speed);
@@ -48,6 +63,37 @@ public class MonsterController : BaseController
         public int lookDir;
         public Vector3 vecDir;
     }
+    void FindingWayMenu()
+    {
+        Vector3[,] searchDir = new Vector3[,] {
+            { new Vector3( 0, 1, 0), new Vector3(-1, 0, 0), new Vector3( 0,-1, 0), new Vector3( 1, 0, 0) },
+            { new Vector3(-1, 0, 0), new Vector3( 0,-1, 0), new Vector3( 1, 0, 0), new Vector3( 0, 1, 0) },
+            { new Vector3( 0,-1, 0), new Vector3( 1, 0, 0), new Vector3( 0, 1, 0), new Vector3(-1, 0, 0) },
+            { new Vector3( 1, 0, 0), new Vector3( 0, 1, 0), new Vector3(-1, 0, 0), new Vector3( 0,-1, 0) }};
+
+
+        Vector3Int curcell = _menuScene.GetCellIndex(transform.position);
+        List<WayData> possible = new List<WayData>();
+        for (int i = 0; i < 4; i++)
+        {
+            Vector3Int v = new Vector3Int((int)searchDir[_lookDir, i].x, (int)searchDir[_lookDir, i].y, (int)searchDir[_lookDir, i].z);
+            if (_menuScene._mapData[curcell.y + v.y, curcell.x + v.x] == Define.MapTile.Floor)
+            {
+                WayData data = new WayData();
+                data.lookDir = i;
+                data.vecDir = searchDir[_lookDir, i];
+                possible.Add(data);
+            }
+        }
+
+
+        System.Random rand = new System.Random((int)DateTime.Now.Ticks);
+        int randNum = rand.Next(0, possible.Count);
+        _lookDir = possible[randNum].lookDir;
+        Direction = CalcDirection((LookDir)_lookDir);
+        _dest = _menuScene.GetCellCenterWorld(
+                new Vector3Int(curcell.x + (int)possible[randNum].vecDir.x, curcell.y + (int)possible[randNum].vecDir.y, 0));
+    }
     void FindingWay()
     {
         Vector3[,] searchDir = new Vector3[,] { 
@@ -57,12 +103,12 @@ public class MonsterController : BaseController
             { new Vector3( 1, 0, 0), new Vector3( 0, 1, 0), new Vector3(-1, 0, 0), new Vector3( 0,-1, 0) }};
 
 
-        Vector3Int curcell = _game.GetCellIndex(transform.position);
+        Vector3Int curcell = _gameScene.GetCellIndex(transform.position);
         List<WayData> possible = new List<WayData>();
         for (int i = 0; i < 4; i++)
         {
             Vector3Int v = new Vector3Int((int)searchDir[_lookDir, i].x, (int)searchDir[_lookDir, i].y, (int)searchDir[_lookDir, i].z);
-            if (_game._mapData[curcell.y + v.y, curcell.x + v.x] == Scene_InGame.MapTile.Floor)
+            if (_gameScene._mapData[curcell.y + v.y, curcell.x + v.x] == Define.MapTile.Floor)
             {
                 WayData data = new WayData();
                 data.lookDir = i;
@@ -76,7 +122,7 @@ public class MonsterController : BaseController
         int randNum = rand.Next(0, possible.Count);
         _lookDir = possible[randNum].lookDir;
         Direction = CalcDirection((LookDir)_lookDir);
-        _dest = _game.GetCellCenterWorld(
+        _dest = _gameScene.GetCellCenterWorld(
                 new Vector3Int(curcell.x + (int)possible[randNum].vecDir.x, curcell.y + (int)possible[randNum].vecDir.y, 0));
     }
 
@@ -108,6 +154,10 @@ public class MonsterController : BaseController
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "BombExplosion")
+        {
             Destroy(gameObject);
+
+
+        }
     }
 }

@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class Define
 {
+    public enum MapTile
+    {
+        Floor,
+        Wall,
+        Obstacle,
+        Breakable,
+    }
+
     public enum State
     {
         Idle,

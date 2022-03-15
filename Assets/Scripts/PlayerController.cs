@@ -138,17 +138,10 @@ public class PlayerController : BaseController
 		Invoke("CancelBlink", 2.0f);
 	}
 
-	private void OnCollisionEnter2D(Collision2D collision)
-	{
-		//Debug.Log("=============OnCollisionEnter2D");
-		if (collision.collider.tag == "Enemy")
-		{
-
-			if (_buff._Inv) return;
-
-			InvokeRepeating("Dying", 0f, 0.05f);
-			State = Define.State.Die;
-		}
+	public void SetDie()
+    {
+		InvokeRepeating("Dying", 0f, 0.1f);
+		State = Define.State.Die;
 	}
 
 	private void OnTriggerEnter2D(Collider2D collision)
@@ -159,8 +152,8 @@ public class PlayerController : BaseController
 		{
 			if (_buff._Inv) return;
 
-			InvokeRepeating("Dying", 0f, 0.1f);
-			State = Define.State.Die;
+			SetDie();
+
 		}
 	}
 

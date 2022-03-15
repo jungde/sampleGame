@@ -15,33 +15,28 @@ public class Scene_InGame : MonoBehaviour
     public Tilemap _tilemapFloor;
     public GameObject _startPoint;
     TextMeshProUGUI _RemainingTime;
+    PlayerController _player;
+    public GameObject _popup_Success;
+    public GameObject _popup_TimeOver;
 
     int _mapFloorWidth = 29;
     int _mapFloorHeight = 13;
-    public MapTile[,] _mapData = default;
+    public Define.MapTile[,] _mapData = default;
 
-    float time;
-
-    public enum MapTile
-    {
-        Floor,
-        Wall,
-        Obstacle,
-        Breakable,
-    }
+    float _startTime;
+    public float _gapTime;
+    public bool _showPopup;
+    float _gameTime = 120.0f;
 
     private void Awake()
     {
-        if(GameObject.FindGameObjectWithTag("Fade"))
-            GameObject.FindGameObjectWithTag("Fade").GetComponent<Fade>().FadeIn();
-
         _grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
         _tilemapHill = GameObject.Find("Tilemap_Hill").GetComponent<Tilemap>();
         _tilemapWall = GameObject.Find("Tilemap_Wall").GetComponent<Tilemap>();
         _tilemapFloor = GameObject.Find("Tilemap_Floor").GetComponent<Tilemap>();
         _RemainingTime = GameObject.FindGameObjectWithTag("RemainingTime").GetComponent<TextMeshProUGUI>();
 
-        _mapData = new MapTile[_mapFloorHeight, _mapFloorWidth];
+        _mapData = new Define.MapTile[_mapFloorHeight, _mapFloorWidth];
         InitMapData();
         
 
@@ -61,6 +56,11 @@ public class Scene_InGame : MonoBehaviour
         Vector3Int posStart = _tilemapFloor.WorldToCell(_startPoint.transform.position);
         Vector3 posCellCenter = _tilemapFloor.GetCellCenterLocal(posStart) - new Vector3(0.0f, 0.5f, 0.0f);
         GameObject instance = Instantiate(player, posCellCenter, Quaternion.identity);
+
+        _popup_Success = Resources.Load<GameObject>("Prefabs/Popup_Success");
+        _popup_TimeOver = Resources.Load<GameObject>("Prefabs/Popup_TimeOver");
+
+        _startTime = Time.time;
     }
 
     void Start()
@@ -70,12 +70,19 @@ public class Scene_InGame : MonoBehaviour
 
     void Update()
     {
-        //float gap = 5.0f - Time.time;
-        //if (gap <= 0)
-        //    gap = 0;
-        //_RemainingTime.text = string.Format("남은시간 {0:0.0}", gap);
+        if (!_showPopup)
+        {
+            _gapTime = Time.time - _startTime;
+            if (_gapTime >= _gameTime)
+            {
+                _gapTime = 0.0f;
+                Instantiate(_popup_TimeOver, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
+                _showPopup = true;
+            }
+            _RemainingTime.text = string.Format("남은시간  {0:0.0}", _gameTime - _gapTime);
+        }
 
-        
+
     }
 
     public Vector3Int GetCellIndex(Vector3 posWorld)
@@ -101,21 +108,21 @@ public class Scene_InGame : MonoBehaviour
             {
                 if (_tilemapHill.GetSprite(new Vector3Int(j, i, 0)) ||
                    _tilemapWall.GetSprite(new Vector3Int(j, i, 0)))
-                    _mapData[i, j] = MapTile.Wall;
+                    _mapData[i, j] = Define.MapTile.Wall;
             }
 
         GameObject[] go = GameObject.FindGameObjectsWithTag("Obstacle");
         foreach (var item in go)
         {
             Vector3Int cell = GetCellIndex(item.transform.position);
-            _mapData[cell.y, cell.x] = MapTile.Obstacle;
+            _mapData[cell.y, cell.x] = Define.MapTile.Obstacle;
         }
 
         go = GameObject.FindGameObjectsWithTag("BreakableObstacle");
         foreach (var item in go)
         {
             Vector3Int cell = GetCellIndex(item.transform.position);
-            _mapData[cell.y, cell.x] = MapTile.Breakable;
+            _mapData[cell.y, cell.x] = Define.MapTile.Breakable;
         }
     }
 
