@@ -12,13 +12,15 @@ public class Scene_InGame : MonoBehaviour
     Grid _grid;
     Tilemap _tilemapHill;
     Tilemap _tilemapWall;
-    Tilemap _tilemapFloor;
-    //TextMeshProUGUI _RemainingTime;
+    public Tilemap _tilemapFloor;
+    public GameObject _startPoint;
+    TextMeshProUGUI _RemainingTime;
 
     int _mapFloorWidth = 29;
     int _mapFloorHeight = 13;
     public MapTile[,] _mapData = default;
 
+    float time;
 
     public enum MapTile
     {
@@ -37,13 +39,13 @@ public class Scene_InGame : MonoBehaviour
         _tilemapHill = GameObject.Find("Tilemap_Hill").GetComponent<Tilemap>();
         _tilemapWall = GameObject.Find("Tilemap_Wall").GetComponent<Tilemap>();
         _tilemapFloor = GameObject.Find("Tilemap_Floor").GetComponent<Tilemap>();
-        //_RemainingTime = GameObject.FindGameObjectWithTag("RemainingTime").GetComponent<TextMeshProUGUI>();
+        _RemainingTime = GameObject.FindGameObjectWithTag("RemainingTime").GetComponent<TextMeshProUGUI>();
 
         _mapData = new MapTile[_mapFloorHeight, _mapFloorWidth];
         InitMapData();
         
 
-        GameObject enemy = Resources.Load<GameObject>("Enemy/Prefab/blue1");
+        GameObject enemy = Resources.Load<GameObject>("Prefabs/blue1");
         GameObject[] gos = GameObject.FindGameObjectsWithTag("SpawnPoint");
         List<GameObject> lgos = new List<GameObject>(gos);
         foreach(GameObject o in lgos)
@@ -51,9 +53,14 @@ public class Scene_InGame : MonoBehaviour
             Vector3Int cellIndex = _grid.WorldToCell(o.transform.position);
             Vector3 cellCenterWorld = _grid.GetCellCenterLocal(cellIndex);
 
-            GameObject instance = Instantiate(enemy, cellCenterWorld, Quaternion.identity);
+            Instantiate(enemy, cellCenterWorld, Quaternion.identity);
         }
 
+        GameObject player = Resources.Load<GameObject>("Prefabs/Player");
+        _startPoint = GameObject.Find("@StartPosition");
+        Vector3Int posStart = _tilemapFloor.WorldToCell(_startPoint.transform.position);
+        Vector3 posCellCenter = _tilemapFloor.GetCellCenterLocal(posStart) - new Vector3(0.0f, 0.5f, 0.0f);
+        GameObject instance = Instantiate(player, posCellCenter, Quaternion.identity);
     }
 
     void Start()
@@ -63,6 +70,11 @@ public class Scene_InGame : MonoBehaviour
 
     void Update()
     {
+        //float gap = 5.0f - Time.time;
+        //if (gap <= 0)
+        //    gap = 0;
+        //_RemainingTime.text = string.Format("남은시간 {0:0.0}", gap);
+
         
     }
 
@@ -107,18 +119,20 @@ public class Scene_InGame : MonoBehaviour
         }
     }
 
-    //private void OnGUI()
-    //{
-    //    for (int i = 0; i < _mapFloorHeight; i++)
-    //        for (int j = 0; j < _mapFloorWidth; j++)
-    //        {
-    //            GUIStyle style = new GUIStyle();
-    //            Rect rect = new Rect(j*30, i*50+100, Screen.width, Screen.height);
-    //            style.alignment = TextAnchor.UpperLeft;
-    //            style.fontSize = 50;
-    //            style.normal.textColor = Color.red;
-    //            string text = string.Format("{0}", (int)_mapData[i, j]);
-    //            GUI.Label(rect, text, style);
-    //        }
-    //}
+    private void OnGUI()
+    {
+        //for (int i = 0; i < _mapFloorHeight; i++)
+        //    for (int j = 0; j < _mapFloorWidth; j++)
+        //    {
+        //        GUIStyle style = new GUIStyle();
+        //        Rect rect = new Rect(j * 30, i * 50 + 100, Screen.width, Screen.height);
+        //        style.alignment = TextAnchor.UpperLeft;
+        //        style.fontSize = 50;
+        //        style.normal.textColor = Color.red;
+        //        string text = string.Format("{0}", (int)_mapData[i, j]);
+        //        GUI.Label(rect, text, style);
+        //    }
+
+
+    }
 }

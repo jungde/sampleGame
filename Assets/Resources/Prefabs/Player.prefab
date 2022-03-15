@@ -73,7 +73,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1423258179
-  m_SortingLayer: 5
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 8793639957104055765, guid: 9c447c54c8e0416e9446cadb88c48fd3,
     type: 3}
@@ -99,9 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f1743475eb34a41b19005d68505250, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerStartPosition: {fileID: 0}
-  speed: 5
-  _tilemapTerrain: {fileID: 0}
 --- !u!58 &9036371662057972739
 CircleCollider2D:
   m_ObjectHideFlags: 0

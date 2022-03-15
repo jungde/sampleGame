@@ -8,6 +8,7 @@ public abstract class BaseController : MonoBehaviour
 
     protected SpriteRenderer _spriterender;
     protected Rigidbody2D _rigid2D;
+    protected CircleCollider2D _circleCollider2D;
     protected Animator _animator;
 
     protected Vector2 _direction; // 이동방향
@@ -21,6 +22,7 @@ public abstract class BaseController : MonoBehaviour
         {
             _direction = value;
 
+            if (_state == Define.State.Die) return;
             if (_direction.x == 0.0f && _direction.y == 0.0f)
             {
                 State = Define.State.Idle;
@@ -83,6 +85,8 @@ public abstract class BaseController : MonoBehaviour
         {
             case Define.State.Idle:
                 {
+                    _animator.speed = 1.0f;
+
                     if (_predirection.x < 0.0f)
                     {
                         _animator.CrossFade("idle_side", 0.0f);
@@ -102,6 +106,8 @@ public abstract class BaseController : MonoBehaviour
                 break;
             case Define.State.Moving:
                 {
+                    _animator.speed = 1.0f;
+
                     if (_direction.x < 0.0f)
                     {
                         _animator.CrossFade("run_side", 0.0f);
@@ -120,6 +126,7 @@ public abstract class BaseController : MonoBehaviour
                 }
                 break;
             case Define.State.Die:
+                _animator.speed = 0.0f;
                 break;
         }
     }

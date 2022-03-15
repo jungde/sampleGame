@@ -7,8 +7,7 @@ using UnityEngine.UI;
 
 public class Input_ByMobile : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
-    [SerializeField]
-    PlayerController _player = default;
+    public PlayerController _player = default;
 
     GraphicRaycaster _raycaster;
     Action action;
@@ -27,6 +26,15 @@ public class Input_ByMobile : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     void Update()
     {
+        if(_player.State == Define.State.Die)
+        {
+            action -= _player.LeftMove;
+            action -= _player.RightMove;
+            action -= _player.UpMove;
+            action -= _player.DownMove;
+            _player.NoMove();
+        }
+
         if(action != null)
             action.Invoke();
     }

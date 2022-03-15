@@ -5,8 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Input_ByPC : MonoBehaviour
 {
-    [SerializeField]
-    PlayerController _player = default;
+    public PlayerController _player = default;
 
     void Start()
     {
@@ -16,8 +15,10 @@ public class Input_ByPC : MonoBehaviour
     void Update()
     {
         if (Application.platform != RuntimePlatform.WindowsEditor) return;
+        if (_player.State == Define.State.Die) 
+            return;
 
-        if (Input.GetKeyUp(KeyCode.A) ||
+            if (Input.GetKeyUp(KeyCode.A) ||
             Input.GetKeyUp(KeyCode.D) ||
             Input.GetKeyUp(KeyCode.W) ||
             Input.GetKeyUp(KeyCode.S) ||

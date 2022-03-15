@@ -1,8 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class MonsterController : BaseController
 {
@@ -19,7 +17,6 @@ public class MonsterController : BaseController
         Right = 3,
     }
     int _lookDir = (int)LookDir.Up;
-    bool isFind;
 
     protected override void Init()
     {
@@ -27,6 +24,7 @@ public class MonsterController : BaseController
 
         _spriterender = gameObject.GetComponentInChildren<SpriteRenderer>();
         _rigid2D = GetComponent<Rigidbody2D>();
+        _circleCollider2D = GetComponent<CircleCollider2D>();
         _animator = GetComponent<Animator>();
         _game = GameObject.Find("@Scene").GetComponent<Scene_InGame>();
 
@@ -73,7 +71,8 @@ public class MonsterController : BaseController
             }                
         }
 
-        System.Random rand = new System.Random();
+        
+        System.Random rand = new System.Random((int)DateTime.Now.Ticks);
         int randNum = rand.Next(0, possible.Count);
         _lookDir = possible[randNum].lookDir;
         Direction = CalcDirection((LookDir)_lookDir);

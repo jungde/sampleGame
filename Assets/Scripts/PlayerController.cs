@@ -6,24 +6,21 @@ using UnityEngine.UI;
 
 public class PlayerController : BaseController
 {
-	[SerializeField]
-	Transform _playerStartPosition = default;
-	Vector3Int _posCellPlayer;
-
 	AudioSource _audioSourceRun;
 	AudioClip _audioClipRun;
-
 	GameObject _bomb;
 
-	[SerializeField]
-	float speed = 5.0f;
-
-	[SerializeField]
-	Tilemap _tilemapTerrain = default;
-
+	Scene_InGame _game;
 	Vector2 _camerasight;
 	Vector2 _startpoint;
 	Vector2 _endpoint;
+	float speed = 5.0f;
+
+    struct Buff
+    {
+		public bool _Inv;
+    }
+	Buff _buff;
 
 	protected override void Init()
 	{
@@ -31,13 +28,11 @@ public class PlayerController : BaseController
 
 		_spriterender = GetComponent<SpriteRenderer>();
 		_rigid2D = GetComponent<Rigidbody2D>();
+		_circleCollider2D = GetComponent<CircleCollider2D>();
 		_animator = GetComponent<Animator>();
-
-		Vector3Int posStart = _tilemapTerrain.WorldToCell(_playerStartPosition.position);
-		Vector3 posCellCenter = _tilemapTerrain.GetCellCenterLocal(posStart);
-		transform.position = posCellCenter - new Vector3(0.0f, 0.5f, 0.0f);
-
 		_audioClipRun = Resources.Load<AudioClip>("Hit23");
+		_game = GameObject.Find("@Scene").GetComponent<Scene_InGame>();
+		_bomb = Resources.Load<GameObject>("Prefabs/Bomb");
 
 		float h = Camera.main.GetComponent<Camera>().orthographicSize;
 		float aspect = (float)Screen.width / (float)Screen.height;
@@ -52,14 +47,14 @@ public class PlayerController : BaseController
 		_audioSourceRun.pitch = 1.0f;
 		_audioSourceRun.clip = _audioClipRun;
 
+		GameObject.Find("MobileInput").GetComponent<Input_ByMobile>()._player = this;
+		GameObject.Find("PCInput").GetComponent<Input_ByPC>()._player = this;
 
-		_bomb = Resources.Load<GameObject>("Prefabs/Bomb");
+		ResetPlayer();
 	}
 
 	protected override void Update()
     {
-		_posCellPlayer = _tilemapTerrain.WorldToCell(transform.position + new Vector3(0.0f, 0.5f, 0.0f));
-
 		switch (State)
 		{
 			case Define.State.Idle:
@@ -70,6 +65,7 @@ public class PlayerController : BaseController
 					_audioSourceRun.Play();
 				break;
 			case Define.State.Die:
+				
 				break;
 		}
 
@@ -92,7 +88,83 @@ public class PlayerController : BaseController
 		}
     }
 
-    public void LeftMove()
+	void Blink()
+	{
+		_buff._Inv = true;
+
+		Color color = _spriterender.color;
+		if (color.a == 1.0f)
+			color.a = 0.0f;
+		else
+			color.a = 1.0f;
+		_spriterender.color = color;
+	}
+
+	void CancelBlink()
+    {
+		_buff._Inv = false;
+		Color color = _spriterender.color;
+		color.a = 1.0f;
+		_spriterender.color = color;
+
+		CancelInvoke("Blink");
+    }
+
+	void Dying()
+    {
+		_circleCollider2D.enabled = false;
+		Color color = _spriterender.color;
+		color.a -= 0.05f;
+		_spriterender.color = color;
+		if (color.a <= 0.0f)
+        {
+			ResetPlayer();
+			CancelInvoke("Dying");
+		}
+	}
+
+	void ResetPlayer()
+    {
+		Vector3Int posStart = _game._tilemapFloor.WorldToCell(_game._startPoint.transform.position);
+		Vector3 posCellCenter = _game._tilemapFloor.GetCellCenterLocal(posStart) - new Vector3(0.0f, 0.5f, 0.0f);
+		transform.position = posCellCenter;
+
+		_circleCollider2D.enabled = true;
+
+		_state = Define.State.Idle;
+		NoMove();
+
+		InvokeRepeating("Blink", 0f, 0.05f);
+		Invoke("CancelBlink", 2.0f);
+	}
+
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		//Debug.Log("=============OnCollisionEnter2D");
+		if (collision.collider.tag == "Enemy")
+		{
+
+			if (_buff._Inv) return;
+
+			InvokeRepeating("Dying", 0f, 0.05f);
+			State = Define.State.Die;
+		}
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		//Debug.Log("=============OnTriggerEnter2D");
+
+		if (collision.tag == "Enemy" || collision.tag == "BombExplosion")
+		{
+			if (_buff._Inv) return;
+
+			InvokeRepeating("Dying", 0f, 0.1f);
+			State = Define.State.Die;
+		}
+	}
+
+	public void LeftMove()
     {
 		Vector2 v = Direction;
 		v.x = -1.0f;
@@ -129,6 +201,9 @@ public class PlayerController : BaseController
 
     public void SetupBomb()
     {
-		Instantiate(_bomb, _tilemapTerrain.GetCellCenterLocal(_posCellPlayer), Quaternion.identity);
+		Vector3Int cell = _game._tilemapFloor.WorldToCell(transform.position + new Vector3(0.0f, 0.5f, 0.0f));
+		Instantiate(_bomb, _game._tilemapFloor.GetCellCenterLocal(cell), Quaternion.identity);
 	}
+
+
 }

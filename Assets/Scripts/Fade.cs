@@ -42,9 +42,6 @@ public class Fade : MonoBehaviour
         {
             color.a = 0.0f;
             _image.color = color;
-
-            gameObject.SetActive(false);
-            CancelInvoke("StartFade");
         }
         else
         {
@@ -61,11 +58,6 @@ public class Fade : MonoBehaviour
         {
             color.a = 1.0f;
             _image.color = color;
-
-            gameObject.SetActive(false);
-            CancelInvoke("StartFade");
-
-            SceneManager.LoadScene(_sceneName);
         }
         else
         {
