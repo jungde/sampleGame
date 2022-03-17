@@ -6,7 +6,12 @@ public class BreakableObstacle : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "BombExplosion")
-            Destroy(gameObject);
+        Invoke("DestroyObstacle", 0.7f);
+        
+    }
+
+    void DestroyObstacle()
+    {
+        Destroy(gameObject);
     }
 }

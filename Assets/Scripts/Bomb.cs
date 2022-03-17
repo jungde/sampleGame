@@ -11,7 +11,7 @@ public class Bomb : MonoBehaviour
 
     void Start()
     {
-        _explosion = Resources.Load<GameObject>("Prefabs/BombExplosion");
+        _explosion = Resources.Load<GameObject>("Prefabs/Explosion");
 
         _audioClipBomb = Resources.Load<AudioClip>("Jump14");
         _audioSourceBomb = gameObject.AddComponent<AudioSource>();

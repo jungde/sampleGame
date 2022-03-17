@@ -9,6 +9,7 @@ public class BombExplosion : MonoBehaviour
     void Start()
     {
         _gameScene = GameObject.Find("@Scene").GetComponent<Scene_InGame>();
+        Invoke("ExplosionComplete", 0.7f);
     }
 
     void Update()
@@ -18,9 +19,9 @@ public class BombExplosion : MonoBehaviour
 
     public void ExplosionComplete()
     {
-        if (transform.parent.gameObject)
+        if (transform.gameObject)
         {
-            Destroy(transform.parent.gameObject);
+            Destroy(transform.gameObject);
 
             if (_gameScene._showPopup == false)
             {
