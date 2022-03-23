@@ -6,7 +6,7 @@ public class BreakableObstacle : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Invoke("DestroyObstacle", 0.7f);
+        Invoke("DestroyObstacle", 0.0f);
         
     }
 
